@@ -1,6 +1,6 @@
 """
 actuators.py
-Classes to control the motors and servos. These classes 
+Classes to control the motors and servos. These classes
 are wrapped in a mixer class before being used in the drive loop.
 """
 
@@ -126,8 +126,8 @@ class PulseController:
 
 @deprecated("Deprecated in favor or PulseController.  This will be removed in a future release")
 class PCA9685:
-    ''' 
-    PWM motor controler using PCA9685 boards. 
+    '''
+    PWM motor controler using PCA9685 boards.
     This is used for most RC Cars
     '''
     def __init__(self, channel, address=0x40, frequency=60, busnum=None, init_delay=0.1):
@@ -158,7 +158,7 @@ class PCA9685:
         if duty_cycle < 0 or duty_cycle > 1:
             logging.error("duty_cycle must be in range 0 to 1")
             duty_cycle = clamp(duty_cycle, 0, 1)
-            
+
         if duty_cycle == 1:
             self.set_high()
         elif duty_cycle == 0:
@@ -182,30 +182,30 @@ class PCA9685:
 
 
 class VESC:
-    ''' 
+    '''
     VESC Motor controler using pyvesc
     This is used for most electric scateboards.
-    
+
     inputs: serial_port---- port used communicate with vesc. for linux should be something like /dev/ttyACM1
     has_sensor=False------- default value from pyvesc
     start_heartbeat=True----default value from pyvesc (I believe this sets up a heartbeat and kills speed if lost)
     baudrate=115200--------- baudrate used for communication with VESC
     timeout=0.05-------------time it will try before giving up on establishing connection
-    
+
     percent=.2--------------max percentage of the dutycycle that the motor will be set to
     outputs: none
-    
+
     uses the pyvesc library to open communication with the VESC and sets the servo to the angle (0-1) and the duty_cycle(speed of the car) to the throttle (mapped so that percentage will be max/min speed)
-    
+
     Note that this depends on pyvesc, but using pip install pyvesc will create a pyvesc file that
-    can only set the speed, but not set the servo angle. 
-    
+    can only set the speed, but not set the servo angle.
+
     Instead please use:
     pip install git+https://github.com/LiamBindle/PyVESC.git@master
     to install the pyvesc library
     '''
     def __init__(self, serial_port, percent=.2, has_sensor=False, start_heartbeat=True, baudrate=115200, timeout=0.05, steering_scale = 1.0, steering_offset = 0.0 ):
-        
+
         try:
             import pyvesc
         except Exception as err:
@@ -216,12 +216,12 @@ class VESC:
             print("\n\n\n")
             time.sleep(1)
             raise
-        
+
         assert percent <= 1 and percent >= -1,'\n\nOnly percentages are allowed for MAX_VESC_SPEED (we recommend a value of about .2) (negative values flip direction of motor)'
         self.steering_scale = steering_scale
         self.steering_offset = steering_offset
         self.percent = percent
-        
+
         try:
             self.v = pyvesc.VESC(serial_port, has_sensor, start_heartbeat, baudrate, timeout)
         except Exception as err:
@@ -230,7 +230,7 @@ class VESC:
             print("sudo chmod a+rw {}".format(serial_port), "\n\n\n\n")
             time.sleep(1)
             raise
-        
+
     def run(self, angle, throttle):
         self.v.set_servo((angle * self.steering_scale) + self.steering_offset)
         self.v.set_duty_cycle(throttle*self.percent)
@@ -396,7 +396,7 @@ class PWMThrottle:
 #
 @deprecated("JHat is unsupported/undocumented in the framework.  It will be removed in a future release.")
 class JHat:
-    ''' 
+    '''
     PWM motor controller using Teensy emulating PCA9685.
     '''
     def __init__(self, channel, address=0x40, frequency=60, busnum=None):
@@ -417,14 +417,14 @@ class JHat:
 
         # we install our own write that is more efficient use of interrupts
         self.pwm.set_pwm = self.set_pwm
-        
+
     def set_pulse(self, pulse):
-        self.set_pwm(self.channel, 0, pulse) 
+        self.set_pwm(self.channel, 0, pulse)
 
     def set_pwm(self, channel, on, off):
         # sets a single PWM channel
         self.pwm._device.writeList(self.register, [off & 0xFF, off >> 8])
-        
+
     def run(self, pulse):
         self.set_pulse(pulse)
 
@@ -440,8 +440,8 @@ class JHat:
 #
 @deprecated("JHatReader is unsupported/undocumented in the framework.  It may be removed in a future release.")
 class JHatReader:
-    ''' 
-    Read RC controls from teensy 
+    '''
+    Read RC controls from teensy
     '''
     def __init__(self, channel, address=0x40, frequency=60, busnum=None):
         import Adafruit_PCA9685
@@ -457,7 +457,7 @@ class JHatReader:
     def read_pwm(self):
         '''
         send read requests via i2c bus to Teensy to get
-        pwm control values from last RC input  
+        pwm control values from last RC input
         '''
         h1 = self.pwm._device.readU8(self.register)
         # first byte of header must be 100, otherwize we might be reading
@@ -465,14 +465,14 @@ class JHatReader:
         while h1 != 100:
             logger.debug("skipping to start of header")
             h1 = self.pwm._device.readU8(self.register)
-        
+
         h2 = self.pwm._device.readU8(self.register)
         # h2 ignored now
 
         val_a = self.pwm._device.readU8(self.register)
         val_b = self.pwm._device.readU8(self.register)
         self.steering = (val_b << 8) + val_a
-        
+
         val_c = self.pwm._device.readU8(self.register)
         val_d = self.pwm._device.readU8(self.register)
         self.throttle = (val_d << 8) + val_c
@@ -484,7 +484,7 @@ class JHatReader:
     def update(self):
         while(self.running):
             self.read_pwm()
-        
+
     def run_threaded(self):
         return self.steering, self.throttle
 
@@ -502,27 +502,101 @@ class JHatReader:
 # and integrate this into complete.py
 #
 @deprecated("This appears to be unsupported/undocumented in the framework. This may be removed in a future release")
+class PWMSteering:
+    """
+    Wrapper over a PWM motor cotnroller to convert angles to PWM pulses.
+    """
+    LEFT_ANGLE = -1
+    RIGHT_ANGLE = 1
+
+    def __init__(self, controller=None,
+                       left_pulse=290,
+                       right_pulse=490):
+
+        self.controller = controller
+        self.left_pulse = left_pulse
+        self.right_pulse = right_pulse
+
+
+    def run(self, angle):
+        #map absolute angle to angle that vehicle can implement.
+        pulse = dk.utils.map_range(angle,
+                                self.LEFT_ANGLE, self.RIGHT_ANGLE,
+                                self.left_pulse, self.right_pulse)
+
+        self.controller.set_pulse(pulse)
+
+    def shutdown(self):
+        self.run(0) #set steering straight
+
+
+
+class PWMThrottle:
+    """
+    Wrapper over a PWM motor cotnroller to convert -1 to 1 throttle
+    values to PWM pulses.
+    """
+    MIN_THROTTLE = -1
+    MAX_THROTTLE =  1
+
+    def __init__(self, controller=None,
+                       max_pulse=4095,
+                       min_pulse=-4095,
+                       zero_pulse=0):
+
+        self.controller = controller
+        self.max_pulse = max_pulse
+        self.min_pulse = min_pulse
+        self.zero_pulse = zero_pulse
+
+        #send zero pulse to calibrate ESC
+        print("Init ESC")
+        self.controller.set_pulse(self.zero_pulse)
+        time.sleep(1)
+
+
+    def run(self, throttle):
+        if throttle > 0:
+            pulse = dk.utils.map_range(throttle,
+                                    0, self.MAX_THROTTLE,
+                                    self.zero_pulse, self.max_pulse)
+            self.controller.pwm.set_pwm(self.controller.channel,0,pulse)
+            self.controller.pwm.set_pwm(self.controller.channel+1,0,0)
+            self.controller.pwm.set_pwm(self.controller.channel+2,0,4095)
+        else:
+            pulse = dk.utils.map_range(throttle,
+                                    self.MIN_THROTTLE, 0,
+                                    self.min_pulse, self.zero_pulse)
+            self.controller.pwm.set_pwm(self.controller.channel,0,- pulse)
+            self.controller.pwm.set_pwm(self.controller.channel+2,0,0)
+            self.controller.pwm.set_pwm(self.controller.channel+1,0,4095)
+
+    def shutdown(self):
+        self.run(0) #stop vehicle
+
+
+
 class Adafruit_DCMotor_Hat:
-    ''' 
-    Adafruit DC Motor Controller 
+    '''
+    Adafruit DC Motor Controller
     Used for each motor on a differential drive car.
     '''
     def __init__(self, motor_num):
         from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
         import atexit
-        
+
         self.FORWARD = Adafruit_MotorHAT.FORWARD
         self.BACKWARD = Adafruit_MotorHAT.BACKWARD
-        self.mh = Adafruit_MotorHAT(addr=0x60) 
-        
+        self.mh = Adafruit_MotorHAT(addr=0x60)
+
         self.motor = self.mh.getMotor(motor_num)
         self.motor_num = motor_num
-        
+
         atexit.register(self.turn_off_motors)
         self.speed = 0
         self.throttle = 0
-    
-        
+
+
     def run(self, speed):
         '''
         Update the speed of the motor where 1 is full forward and
@@ -530,17 +604,17 @@ class Adafruit_DCMotor_Hat:
         '''
         if speed > 1 or speed < -1:
             raise ValueError( "Speed must be between 1(forward) and -1(reverse)")
-        
+
         self.speed = speed
         self.throttle = int(dk.utils.map_range(abs(speed), -1, 1, -255, 255))
-        
-        if speed > 0:            
+
+        if speed > 0:
             self.motor.run(self.FORWARD)
         else:
             self.motor.run(self.BACKWARD)
-            
+
         self.motor.setSpeed(self.throttle)
-        
+
 
     def shutdown(self):
         self.mh.getMotor(self.motor_num).run(Adafruit_MotorHAT.RELEASE)
@@ -805,7 +879,7 @@ class L298N_HBridge_3pin(object):
         if throttle > 1 or throttle < -1:
             logger.warn( f"TwoWheelSteeringThrottle throttle is {throttle}, but it must be between 1(forward) and -1(reverse)")
             throttle = clamp(throttle, -1, 1)
-        
+
         self.speed = throttle
         self.throttle = dk.utils.map_range_float(throttle, -1, 1, -self.max_duty, self.max_duty)
         if self.throttle > self.zero_throttle:
@@ -909,7 +983,7 @@ class L298N_HBridge_2pin(object):
 
         self.throttle=0
         self.speed=0
-        
+
         self.pin_forward.start(0)
         self.pin_backward.start(0)
 
@@ -928,7 +1002,7 @@ class L298N_HBridge_2pin(object):
 
         self.speed = throttle
         self.throttle = dk.utils.map_range_float(throttle, -1, 1, -self.max_duty, self.max_duty)
-        
+
         if self.throttle > self.zero_throttle:
             self.pin_backward.duty_cycle(0)
             self.pin_forward.duty_cycle(self.throttle)
@@ -943,7 +1017,7 @@ class L298N_HBridge_2pin(object):
         self.pin_forward.stop()
         self.pin_backward.stop()
 
-    
+
 #
 # This is being replaced by pins.py and PulseController.
 # GPIO pins can be configured using RPi.GPIO or PIGPIO,
