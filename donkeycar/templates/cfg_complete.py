@@ -42,8 +42,8 @@ SHOW_PILOT_IMAGE = False  # show the image used to do the inference when in auto
 # PATH_MASK = "~/mycar/data/tub_1_20-03-12/*.jpg"
 
 #9865, over rides only if needed, ie. TX2..
-PCA9685_I2C_ADDR1 = 0x40     #steering I2C address, use i2cdetect to validate this number
-PCA9685_I2C_ADDR2 = 0x40     #throttle I2C address, use i2cdetect to validate this number
+PCA9685_I2C_ADDR = 0x40     #steering I2C address, use i2cdetect to validate this number
+PCA9685_I2C_ADDR1 = 0x40    #throttle I2C address, use i2cdetect to validate this number
 PCA9685_I2C_BUSNUM = None   #None will auto detect, which is fine on the pi. But other platforms should specify the bus num.
 
 #SSD1306_128_32
