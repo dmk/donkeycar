@@ -25,6 +25,7 @@ class PiCamera(BaseCamera):
         resolution = (image_w, image_h)
         # initialize the camera and stream
         self.camera = PiCamera() #PiCamera gets resolution (height, width)
+        self.camera.vflip = True
         self.camera.resolution = resolution
         self.camera.framerate = framerate
         self.camera.vflip = vflip
