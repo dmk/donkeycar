@@ -98,7 +98,7 @@ PWM_STEERING_THROTTLE = {
 #
 # I2C_SERVO (deprecated in favor of PWM_STEERING_THROTTLE)
 #
-STEERING_CHANNEL = 1            #(deprecated) channel on the 9685 pwm board 0-15
+STEERING_CHANNEL = 0            #(deprecated) channel on the 9685 pwm board 0-15
 STEERING_LEFT_PWM = 230         #pwm value for full left steering
 STEERING_RIGHT_PWM = 440        #pwm value for full right steering
 THROTTLE_CHANNEL = 0            #(deprecated) channel on the 9685 pwm board 0-15
