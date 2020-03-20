@@ -563,8 +563,8 @@ class PWMThrottle:
             self.controller.pwm.set_pwm(self.controller.channel,0,pulse)
             self.controller.pwm.set_pwm(self.controller.channel+1,0,0)
             self.controller.pwm.set_pwm(self.controller.channel+2,0,4095)
-            self.controller.pwm.set_pwm(self.controller.channel+3,0,pulse)
-            self.controller.pwm.set_pwm(self.controller.channel+4,0,0)
+            self.controller.pwm.set_pwm(self.controller.channel+3,0,0)
+            self.controller.pwm.set_pwm(self.controller.channel+4,0,pulse)
         else:
             pulse = dk.utils.map_range(throttle,
                                     self.MIN_THROTTLE, 0,
@@ -572,8 +572,8 @@ class PWMThrottle:
             self.controller.pwm.set_pwm(self.controller.channel,0,- pulse)
             self.controller.pwm.set_pwm(self.controller.channel+2,0,0)
             self.controller.pwm.set_pwm(self.controller.channel+1,0,4095)
-            self.controller.pwm.set_pwm(self.controller.channel+3,0,0)
-            self.controller.pwm.set_pwm(self.controller.channel+4,0,- pulse)
+            self.controller.pwm.set_pwm(self.controller.channel+3,0,- pulse)
+            self.controller.pwm.set_pwm(self.controller.channel+4,0,0)
 
     def shutdown(self):
         self.run(0) #stop vehicle
