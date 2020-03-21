@@ -43,7 +43,7 @@ SHOW_PILOT_IMAGE = False  # show the image used to do the inference when in auto
 
 #9865, over rides only if needed, ie. TX2..
 PCA9685_I2C_ADDR = 0x40     #steering I2C address, use i2cdetect to validate this number
-PCA9685_I2C_ADDR1 = 0x41    #throttle I2C address, use i2cdetect to validate this number
+PCA9685_I2C_ADDR1 = 0x60    #throttle I2C address, use i2cdetect to validate this number
 PCA9685_I2C_BUSNUM = None   #None will auto detect, which is fine on the pi. But other platforms should specify the bus num.
 
 #SSD1306_128_32
