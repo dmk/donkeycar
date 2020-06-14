@@ -561,25 +561,25 @@ class PWMThrottle:
                                     0, self.MAX_THROTTLE,
                                     self.zero_pulse, self.max_pulse)
             self.controller.pwm.set_pwm(self.controller.channel,0,pulse)
-            self.controller.pwm.set_pwm(self.controller.channel+1,0,0)
-            self.controller.pwm.set_pwm(self.controller.channel+2,0,4095)
+            self.controller.pwm.set_pwm(self.controller.channel+1,0,4095)
+            self.controller.pwm.set_pwm(self.controller.channel+2,0,0)
             self.controller.pwm.set_pwm(self.controller.channel+3,0,0)
             self.controller.pwm.set_pwm(self.controller.channel+4,0,pulse)
             self.controller.pwm.set_pwm(self.controller.channel+7,0,pulse)
-            self.controller.pwm.set_pwm(self.controller.channel+6,0,0)
-            self.controller.pwm.set_pwm(self.controller.channel+5,0,4095)
+            self.controller.pwm.set_pwm(self.controller.channel+6,0,4095)
+            self.controller.pwm.set_pwm(self.controller.channel+5,0,0)
         else:
             pulse = dk.utils.map_range(throttle,
                                     self.MIN_THROTTLE, 0,
                                     self.min_pulse, self.zero_pulse)
             self.controller.pwm.set_pwm(self.controller.channel,0,- pulse)
-            self.controller.pwm.set_pwm(self.controller.channel+2,0,0)
-            self.controller.pwm.set_pwm(self.controller.channel+1,0,4095)
+            self.controller.pwm.set_pwm(self.controller.channel+2,0,4095)
+            self.controller.pwm.set_pwm(self.controller.channel+1,0,0)
             self.controller.pwm.set_pwm(self.controller.channel+3,0,- pulse)
             self.controller.pwm.set_pwm(self.controller.channel+4,0,0)
             self.controller.pwm.set_pwm(self.controller.channel+7,0,- pulse)
-            self.controller.pwm.set_pwm(self.controller.channel+5,0,0)
-            self.controller.pwm.set_pwm(self.controller.channel+6,0,4095)
+            self.controller.pwm.set_pwm(self.controller.channel+5,0,4095)
+            self.controller.pwm.set_pwm(self.controller.channel+6,0,0)
 
     def shutdown(self):
         self.run(0) #stop vehicle
