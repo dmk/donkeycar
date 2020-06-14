@@ -565,7 +565,7 @@ class PWMThrottle:
             self.controller.pwm.set_pwm(self.controller.channel+2,0,4095)
             self.controller.pwm.set_pwm(self.controller.channel+3,0,0)
             self.controller.pwm.set_pwm(self.controller.channel+4,0,pulse)
-            self.controller.pwm.set_pwm(self.controller.channel,7,pulse)
+            self.controller.pwm.set_pwm(self.controller.channel+7,0,pulse)
             self.controller.pwm.set_pwm(self.controller.channel+6,0,0)
             self.controller.pwm.set_pwm(self.controller.channel+5,0,4095)
         else:
@@ -577,7 +577,7 @@ class PWMThrottle:
             self.controller.pwm.set_pwm(self.controller.channel+1,0,4095)
             self.controller.pwm.set_pwm(self.controller.channel+3,0,- pulse)
             self.controller.pwm.set_pwm(self.controller.channel+4,0,0)
-            self.controller.pwm.set_pwm(self.controller.channel,7,- pulse)
+            self.controller.pwm.set_pwm(self.controller.channel+7,0,- pulse)
             self.controller.pwm.set_pwm(self.controller.channel+5,0,0)
             self.controller.pwm.set_pwm(self.controller.channel+6,0,4095)
 
